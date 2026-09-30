@@ -110,27 +110,7 @@
       <label for="address">Service address</label>
       <input id="address" autocomplete="off" placeholder="123 Main St, Van Nuys">
 
-      <div class="row">
-        <div>
-          <label for="jobNo">Job / order # <span class="opt">(optional)</span></label>
-          <input id="jobNo" inputmode="numeric" autocomplete="off">
-        </div>
-        <div>
-          <label for="size">Dumpster size</label>
-          <select id="size">
-            <option value="">Select…</option>
-            <option>3 yard</option><option>9 yard</option><option>10 yard</option>
-            <option>10 yard (clean inert)</option><option>16 yard</option>
-            <option>25 yard</option><option>40 yard</option>
-          </select>
-        </div>
-      </div>
 
-      <label for="custEmail">Customer email <span class="opt">(for their copy)</span></label>
-      <input id="custEmail" type="email" inputmode="email" autocomplete="off" autocapitalize="off">
-
-      <label for="custPhone">Customer phone <span class="opt">(optional)</span></label>
-      <input id="custPhone" type="tel" inputmode="tel" autocomplete="off">
 
       <button class="btn" id="toCustomerBtn">Hand to customer →</button>
       <div class="err" id="setupErr"></div>
@@ -333,11 +313,9 @@ $('toCustomerBtn').onclick = () => {
 
   $('signTitle').textContent = c.name;
   $('hdrSub').textContent = c.name;
-  $('signSummary').innerHTML = '<b>Service address:</b> ' + esc($('address').value) +
-    ($('size').value ? '<br><b>Dumpster:</b> ' + esc($('size').value) : '') +
-    ($('jobNo').value ? '<br><b>Order #:</b> ' + esc($('jobNo').value) : '');
+  $('signSummary').innerHTML = '<b>Service address:</b> ' + esc($('address').value);
   $('companyWrap').hidden = state.contractKey !== 'contractor';
-  $('signEmail').value = $('custEmail').value.trim();
+  $('signEmail').value = '';
   $('printed').value = ''; $('company').value = ''; $('c1').checked = false; $('c2').checked = false;
   err('signErr');
   show('sSign');
@@ -360,8 +338,8 @@ $('submitBtn').onclick = async () => {
   const rec = {
     action: 'sign', id: uuid(), pin: LS.get('tgd_pin', ''),
     contractKey: c.key, contractVersion: c.version,
-    driver: driverName(), jobNumber: $('jobNo').value.trim(), serviceAddress: $('address').value.trim(),
-    dumpsterSize: $('size').value, customerPhone: $('custPhone').value.trim(),
+    driver: driverName(), jobNumber: '', serviceAddress: $('address').value.trim(),
+    dumpsterSize: '', customerPhone: '',
     customerEmail: $('signEmail').value.trim(), printedName: $('printed').value.trim(), company: $('company').value.trim(),
     signature: pad.toDataURL('image/png'), consent: { readAgree: true, esign: true }, viewedToEnd: state.viewedToEnd,
     signedAtClient: new Date().toString(), geo: state.geo, userAgent: navigator.userAgent,
@@ -415,8 +393,7 @@ window.addEventListener('online', flushQueue);
 setInterval(flushQueue, 60000);
 
 $('newBtn').onclick = () => {
-  ['address', 'jobNo', 'custEmail', 'custPhone'].forEach(id => $(id).value = '');
-  $('size').value = '';
+  ['address'].forEach(id => $(id).value = '');
   state.contractKey = null; state.geo = null;
   document.querySelectorAll('#contractChoice button').forEach(x => x.classList.remove('sel'));
   $('hdrSub').textContent = 'Rental Agreement';
