@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f7a3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TGD Contract Sign</title>
+<style>
+  :root {
+    --green: #1f7a3a; --green-dk: #175e2c; --green-lt: #e8f3ec;
+    --ink: #1a1d1b; --muted: #5d6660; --line: #d6dbd8; --bg: #f4f6f5; --card: #fff;
+    --warn: #b45309; --warn-lt: #fef3c7; --err: #b91c1c; --err-lt: #fee2e2;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--green); color: #fff; padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 5; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 700; }
+  header .sub { font-size: 12px; opacity: .85; }
+  .pill { background: var(--warn-lt); color: var(--warn); border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; padding-bottom: 48px; }
+  .screen { display: none; }
+  .screen.on { display: block; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  p.hint { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 5px; }
+  label .opt { font-weight: 400; color: var(--muted); }
+  input, select { width: 100%; font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+  input:focus, select:focus { outline: 2px solid var(--green); border-color: var(--green); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .choice { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .choice button { padding: 16px 8px; border: 2px solid var(--line); background: #fff; border-radius: 10px; font: inherit; font-weight: 700; color: var(--ink); }
+  .choice button small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .choice button.sel { border-color: var(--green); background: var(--green-lt); color: var(--green-dk); }
+  .btn { display: block; width: 100%; padding: 15px; border: 0; border-radius: 10px; background: var(--green); color: #fff; font: inherit; font-weight: 700; font-size: 17px; margin-top: 16px; }
+  .btn:disabled { background: #a9b5ae; }
+  .btn.ghost { background: transparent; color: var(--green-dk); border: 2px solid var(--green); }
+  .btn.small { display: inline-block; width: auto; padding: 8px 14px; font-size: 14px; margin: 0; }
+  .err { background: var(--err-lt); color: var(--err); padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-top: 12px; display: none; }
+  .err.on { display: block; }
+  .summary { font-size: 14px; background: var(--green-lt); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+  .summary b { color: var(--green-dk); }
+  #contractBox { height: 58vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .scrollnote { font-size: 13px; text-align: center; padding: 8px; color: var(--warn); font-weight: 600; }
+  .scrollnote.done { color: var(--green-dk); }
+  .check { display: flex; gap: 10px; align-items: flex-start; margin: 12px 0; font-size: 14px; }
+  .check input { width: 24px; height: 24px; flex: none; margin: 0; accent-color: var(--green); }
+  .padwrap { position: relative; border: 2px dashed var(--line); border-radius: 10px; background: #fff; }
+  .padwrap.locked { opacity: .45; pointer-events: none; }
+  #pad { display: block; width: 100%; height: 180px; touch-action: none; border-radius: 10px; }
+  .padline { position: absolute; left: 16px; right: 16px; bottom: 40px; border-bottom: 1px solid #b8c0bb; pointer-events: none; }
+  .padx { position: absolute; left: 18px; bottom: 44px; color: #9aa39e; font-size: 22px; pointer-events: none; }
+  .padbar { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 13px; color: var(--muted); }
+  .link { background: none; border: 0; color: var(--green-dk); font: inherit; font-weight: 600; text-decoration: underline; padding: 4px; }
+  .done-icon { width: 76px; height: 76px; border-radius: 50%; background: var(--green); color: #fff; font-size: 44px; display: grid; place-items: center; margin: 12px auto; }
+  .done-icon.queued { background: var(--warn); }
+  .center { text-align: center; }
+  .demo { background: var(--warn-lt); color: var(--warn); font-size: 13px; padding: 8px 16px; text-align: center; font-weight: 600; }
+  .spinner { width: 42px; height: 42px; border: 4px solid var(--green-lt); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin: 24px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>The Green Dumpster</h1>
+    <div class="sub" id="hdrSub">Rental Agreement</div>
+  </div>
+  <span class="pill" id="queuePill" hidden></span>
+</header>
+<div class="demo" id="demoBar" hidden>DEMO MODE — no API connected, nothing is saved</div>
+
+<main>
+  <!-- PIN -->
+  <section class="screen" id="sPin">
+    <div class="card">
+      <h2>Driver sign-in</h2>
+      <p class="hint">Enter the driver PIN. You only need to do this once on this phone.</p>
+      <label for="pinIn">Driver PIN</label>
+      <input id="pinIn" type="password" inputmode="numeric" autocomplete="off">
+      <button class="btn" id="pinBtn">Continue</button>
+      <div class="err" id="pinErr"></div>
+    </div>
+  </section>
+
+  <!-- DRIVER SETUP -->
+  <section class="screen" id="sSetup">
+    <div class="card">
+      <h2>New contract</h2>
+      <p class="hint">Fill this in, then hand the phone to the customer.</p>
+
+      <label>Contract</label>
+      <div class="choice" id="contractChoice">
+        <button type="button" data-key="residential">Residential<small>Homeowner</small></button>
+        <button type="button" data-key="contractor">Contractor<small>Business / contractor</small></button>
+      </div>
+
+      <label for="driver">Driver</label>
+      <select id="driver">
+        <option value="">Select…</option>
+        <option>Roberto</option><option>Gerardo</option><option>Hugo</option><option>Charlie</option>
+        <option>Lucas</option><option>Martin</option><option>Abraham</option><option>David</option>
+        <option value="__other">Other…</option>
+      </select>
+      <input id="driverOther" placeholder="Driver name" hidden style="margin-top:8px">
+
+      <label for="address">Service address</label>
+      <input id="address" autocomplete="off" placeholder="123 Main St, Van Nuys">
+
+      <div class="row">
+        <div>
+          <label for="jobNo">Job / order # <span class="opt">(optional)</span></label>
+          <input id="jobNo" inputmode="numeric" autocomplete="off">
+        </div>
+        <div>
+          <label for="size">Dumpster size</label>
+          <select id="size">
+            <option value="">Select…</option>
+            <option>3 yard</option><option>9 yard</option><option>10 yard</option>
+            <option>10 yard (clean inert)</option><option>16 yard</option>
+            <option>25 yard</option><option>40 yard</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="custEmail">Customer email <span class="opt">(for their copy)</span></label>
+      <input id="custEmail" type="email" inputmode="email" autocomplete="off" autocapitalize="off">
+
+      <label for="custPhone">Customer phone <span class="opt">(optional)</span></label>
+      <input id="custPhone" type="tel" inputmode="tel" autocomplete="off">
+
+      <button class="btn" id="toCustomerBtn">Hand to customer →</button>
+      <div class="err" id="setupErr"></div>
+    </div>
+    <div class="center"><button class="link" id="resetPinBtn">Change driver PIN</button></div>
+  </section>
+
+  <!-- CUSTOMER SIGN -->
+  <section class="screen" id="sSign">
+    <div class="card">
+      <h2 id="signTitle">Rental Agreement</h2>
+      <p class="hint">Please read the agreement below. Scroll to the end to sign.</p>
+      <div class="summary" id="signSummary"></div>
+      <div id="contractBox"></div>
+      <div class="scrollnote" id="scrollNote">↓ Scroll to the end of the agreement to sign</div>
+    </div>
+
+    <div class="card" id="signCard">
+      <div id="companyWrap">
+        <label for="company">Company name <span class="opt">(if renting for a business)</span></label>
+        <input id="company" autocomplete="organization">
+      </div>
+
+      <label for="printed">Print your full name</label>
+      <input id="printed" autocomplete="name" autocapitalize="words">
+
+      <label for="signEmail">Email for your copy <span class="opt">(optional)</span></label>
+      <input id="signEmail" type="email" inputmode="email" autocapitalize="off">
+
+      <div class="check"><input type="checkbox" id="c1"><label for="c1" style="margin:0;font-weight:400">
+        I have read and agree to this Agreement, including the indemnification, liability waivers, card-on-file charges and limitation of liability in Sections 2.5, 2.8, 7, 8 and 10.</label></div>
+      <div class="check"><input type="checkbox" id="c2"><label for="c2" style="margin:0;font-weight:400">
+        I agree to sign electronically. My electronic signature is the same as my handwritten signature, and I can get my copy by email.</label></div>
+
+      <label>Sign below</label>
+      <div class="padwrap locked" id="padWrap">
+        <canvas id="pad"></canvas>
+        <div class="padline"></div><div class="padx">✕</div>
+      </div>
+      <div class="padbar"><span id="padHint">Scroll the agreement to the end first</span><button class="link" id="clearPad">Clear</button></div>
+
+      <button class="btn" id="submitBtn" disabled>Sign agreement</button>
+      <div class="err" id="signErr"></div>
+    </div>
+    <div class="center"><button class="link" id="backBtn">← Back to driver</button></div>
+  </section>
+
+  <!-- SENDING -->
+  <section class="screen" id="sSending">
+    <div class="card center">
+      <div class="spinner"></div>
+      <h2>Saving signed agreement…</h2>
+      <p class="hint">This takes a few seconds.</p>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section class="screen" id="sDone">
+    <div class="card center">
+      <div class="done-icon" id="doneIcon">✓</div>
+      <h2 id="doneTitle">Signed — thank you!</h2>
+      <p class="hint" id="doneMsg">Please hand the phone back to your driver.</p>
+      <button class="btn" id="newBtn">Start a new contract</button>
+    </div>
+  </section>
+</main>
+
+<script>
+// ===== CONFIG: paste the Apps Script web app URL here =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbyhSqjkBrfuEyNceuakYTUp7w7oFpk-WJaW9l12-16MRxjPkxtYxXsV5biUbIvGbpps/exec';
+// ==========================================================
+
+const DEMO = !API_URL;
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+};
+const $ = id => document.getElementById(id);
+const state = { contracts: LS.get('tgd_contracts', null), contractKey: null, viewedToEnd: false, geo: null, inked: 0 };
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  window.scrollTo(0, 0);
+}
+function err(id, msg) { const e = $(id); e.textContent = msg || ''; e.classList.toggle('on', !!msg); }
+function uuid() { return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)); }
+
+async function api(body) {
+  const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }); // text/plain → no CORS preflight
+  return res.json();
+}
+
+// ---------- Contracts ----------
+const DEMO_HTML = '<html><body><h3>THE GREEN DUMPSTER LLC</h3><p><b>DEMO AGREEMENT</b></p>' +
+  Array.from({ length: 30 }, (_, i) => '<p><b>' + (i + 1) + '.</b> Sample term text. The real app loads the live contract from Google Docs.</p>').join('') +
+  '</body></html>';
+
+async function loadContracts() {
+  if (DEMO) {
+    state.contracts = [
+      { key: 'residential', name: 'Residential Dumpster Rental Agreement', version: 'demo', html: DEMO_HTML },
+      { key: 'contractor', name: 'Contractor Dumpster Rental Agreement', version: 'demo', html: DEMO_HTML },
+    ];
+    return;
+  }
+  try {
+    const r = await fetch(API_URL).then(r => r.json());
+    if (r.ok) { state.contracts = r.contracts; LS.set('tgd_contracts', r.contracts); }
+  } catch (e) { /* offline — use cached copy */ }
+}
+
+function renderContract(c) {
+  const box = $('contractBox');
+  box.innerHTML = '';
+  const host = document.createElement('div');
+  box.appendChild(host);
+  const root = host.attachShadow({ mode: 'open' });
+  const doc = new DOMParser().parseFromString(c.html, 'text/html');
+  const styles = Array.from(doc.querySelectorAll('style')).map(s => s.textContent).join('\n');
+  root.innerHTML = '<style>' + styles + `
+    .wrap { max-width: none !important; padding: 16px !important; margin: 0 !important; }
+    .wrap * { max-width: 100%; }
+    .wrap img { height: auto !important; }
+    .wrap p, .wrap li, .wrap span { font-size: 15px !important; line-height: 1.45 !important; }
+  </style><div class="wrap ${doc.body.className}">${doc.body.innerHTML}</div>`;
+  box.scrollTop = 0;
+  state.viewedToEnd = false;
+  updateLock();
+  requestAnimationFrame(checkScroll);
+}
+
+function checkScroll() {
+  const b = $('contractBox');
+  if (!state.viewedToEnd && b.scrollTop + b.clientHeight >= b.scrollHeight - 40) {
+    state.viewedToEnd = true;
+    updateLock();
+  }
+}
+
+function updateLock() {
+  const ok = state.viewedToEnd;
+  $('padWrap').classList.toggle('locked', !ok);
+  $('scrollNote').textContent = ok ? '✓ You reached the end of the agreement' : '↓ Scroll to the end of the agreement to sign';
+  $('scrollNote').classList.toggle('done', ok);
+  $('padHint').textContent = ok ? 'Sign with your finger' : 'Scroll the agreement to the end first';
+  validateSign();
+}
+
+// ---------- Signature pad ----------
+const pad = $('pad');
+let ctx, drawing = false, last = null;
+function sizePad() {
+  const r = pad.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  pad.width = Math.round(r.width * dpr); pad.height = Math.round(r.height * dpr);
+  ctx = pad.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, r.width, r.height);
+  ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0b1f4d';
+  state.inked = 0; validateSign();
+}
+function pt(e) { const r = pad.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+pad.addEventListener('pointerdown', e => { drawing = true; last = pt(e); pad.setPointerCapture(e.pointerId); e.preventDefault(); });
+pad.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const p = pt(e);
+  ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+  last = p; state.inked++; e.preventDefault();
+});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(t => pad.addEventListener(t, () => { if (drawing) { drawing = false; validateSign(); } }));
+$('clearPad').onclick = sizePad;
+
+// ---------- Validation ----------
+function validateSign() {
+  const ok = state.viewedToEnd && $('printed').value.trim().length >= 3 && $('c1').checked && $('c2').checked && state.inked > 15;
+  $('submitBtn').disabled = !ok;
+}
+['printed', 'c1', 'c2'].forEach(id => $(id).addEventListener('input', validateSign));
+['c1', 'c2'].forEach(id => $(id).addEventListener('change', validateSign));
+$('contractBox').addEventListener('scroll', checkScroll, { passive: true });
+
+// ---------- Driver setup ----------
+$('contractChoice').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.contractKey = b.dataset.key;
+  document.querySelectorAll('#contractChoice button').forEach(x => x.classList.toggle('sel', x === b));
+});
+$('driver').addEventListener('change', () => { $('driverOther').hidden = $('driver').value !== '__other'; });
+function driverName() { return $('driver').value === '__other' ? $('driverOther').value.trim() : $('driver').value; }
+
+$('toCustomerBtn').onclick = () => {
+  err('setupErr');
+  if (!state.contractKey) return err('setupErr', 'Pick Residential or Contractor.');
+  if (!driverName()) return err('setupErr', 'Select the driver.');
+  if (!$('address').value.trim()) return err('setupErr', 'Enter the service address.');
+  if (!state.contracts) return err('setupErr', "Can't load the contracts — check signal and try again."), loadContracts();
+  const c = state.contracts.find(x => x.key === state.contractKey);
+  LS.set('tgd_driver', { sel: $('driver').value, other: $('driverOther').value });
+
+  $('signTitle').textContent = c.name;
+  $('hdrSub').textContent = c.name;
+  $('signSummary').innerHTML = '<b>Service address:</b> ' + esc($('address').value) +
+    ($('size').value ? '<br><b>Dumpster:</b> ' + esc($('size').value) : '') +
+    ($('jobNo').value ? '<br><b>Order #:</b> ' + esc($('jobNo').value) : '');
+  $('companyWrap').hidden = state.contractKey !== 'contractor';
+  $('signEmail').value = $('custEmail').value.trim();
+  $('printed').value = ''; $('company').value = ''; $('c1').checked = false; $('c2').checked = false;
+  err('signErr');
+  show('sSign');
+  renderContract(c);
+  sizePad();
+  getGeo();
+};
+$('backBtn').onclick = () => { $('hdrSub').textContent = 'Rental Agreement'; show('sSetup'); };
+
+function getGeo() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    p => { state.geo = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }; },
+    () => {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 120000 });
+}
+
+// ---------- Submit + offline queue ----------
+$('submitBtn').onclick = async () => {
+  const c = state.contracts.find(x => x.key === state.contractKey);
+  const rec = {
+    action: 'sign', id: uuid(), pin: LS.get('tgd_pin', ''),
+    contractKey: c.key, contractVersion: c.version,
+    driver: driverName(), jobNumber: $('jobNo').value.trim(), serviceAddress: $('address').value.trim(),
+    dumpsterSize: $('size').value, customerPhone: $('custPhone').value.trim(),
+    customerEmail: $('signEmail').value.trim(), printedName: $('printed').value.trim(), company: $('company').value.trim(),
+    signature: pad.toDataURL('image/png'), consent: { readAgree: true, esign: true }, viewedToEnd: state.viewedToEnd,
+    signedAtClient: new Date().toString(), geo: state.geo, userAgent: navigator.userAgent,
+  };
+  show('sSending');
+  if (DEMO) { setTimeout(() => done('sent'), 900); return; }
+  try {
+    const r = await api(rec);
+    if (r.ok) return done('sent');
+    if (r.code === 'PIN') { LS.del('tgd_pin'); show('sSign'); return err('signErr', 'Driver PIN is wrong — hand the phone back to the driver.'); }
+    show('sSign'); err('signErr', 'Could not save: ' + r.error);
+  } catch (e) {
+    // No signal — keep it on the phone and send later.
+    const q = LS.get('tgd_queue', []); q.push(rec);
+    if (LS.set('tgd_queue', q)) done('queued');
+    else { show('sSign'); err('signErr', 'No signal and the phone could not store it. Try again when you have signal.'); }
+  }
+};
+
+function done(kind) {
+  const queued = kind === 'queued';
+  $('doneIcon').classList.toggle('queued', queued);
+  $('doneIcon').textContent = queued ? '⏳' : '✓';
+  $('doneTitle').textContent = queued ? 'Signed — saved on this phone' : 'Signed — thank you!';
+  $('doneMsg').textContent = queued
+    ? 'No signal right now. It will upload automatically when the phone is back online. Please hand the phone back to your driver.'
+    : 'Please hand the phone back to your driver.';
+  updateQueuePill();
+  show('sDone');
+}
+
+async function flushQueue() {
+  if (DEMO) return;
+  let q = LS.get('tgd_queue', []);
+  if (!q.length) return updateQueuePill();
+  const left = [];
+  for (const rec of q) {
+    rec.pin = LS.get('tgd_pin', rec.pin); // PIN may have been re-entered since it was queued
+    try { const r = await api(rec); if (!r.ok && r.code !== 'PIN') console.warn(r.error); if (!r.ok) left.push(rec); }
+    catch (e) { left.push(rec); }
+  }
+  LS.set('tgd_queue', left);
+  updateQueuePill();
+}
+function updateQueuePill() {
+  const n = LS.get('tgd_queue', []).length;
+  $('queuePill').hidden = !n;
+  $('queuePill').textContent = n + ' waiting to upload';
+}
+window.addEventListener('online', flushQueue);
+setInterval(flushQueue, 60000);
+
+$('newBtn').onclick = () => {
+  ['address', 'jobNo', 'custEmail', 'custPhone'].forEach(id => $(id).value = '');
+  $('size').value = '';
+  state.contractKey = null; state.geo = null;
+  document.querySelectorAll('#contractChoice button').forEach(x => x.classList.remove('sel'));
+  $('hdrSub').textContent = 'Rental Agreement';
+  show('sSetup');
+  loadContracts();
+};
+
+// ---------- PIN ----------
+$('pinBtn').onclick = async () => {
+  const pin = $('pinIn').value.trim();
+  err('pinErr');
+  if (!pin) return;
+  if (!DEMO) {
+    try {
+      const r = await api({ action: 'checkPin', pin });
+      if (!r.ok) return err('pinErr', r.error || 'Wrong PIN');
+    } catch (e) { return err('pinErr', 'No signal — try again.'); }
+  }
+  LS.set('tgd_pin', pin);
+  show('sSetup');
+};
+$('resetPinBtn').onclick = () => { LS.del('tgd_pin'); $('pinIn').value = ''; show('sPin'); };
+
+function esc(s) { return String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])); }
+
+// ---------- Boot ----------
+(function boot() {
+  $('demoBar').hidden = !DEMO;
+  const d = LS.get('tgd_driver', null);
+  if (d) { $('driver').value = d.sel; $('driverOther').value = d.other || ''; $('driverOther').hidden = d.sel !== '__other'; }
+  show(DEMO || LS.get('tgd_pin', '') ? 'sSetup' : 'sPin');
+  loadContracts();
+  flushQueue();
+})();
+</script>
+</body>
+</html>
+
