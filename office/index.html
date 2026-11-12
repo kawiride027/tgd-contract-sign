@@ -60,9 +60,6 @@
   .check input { width: 24px; height: 24px; flex: none; margin: 0; accent-color: var(--green); }
   .check label { margin: 0; font-weight: 400; }
   .check.disabled { opacity: .5; }
-  .sendopts { border: 1px solid var(--line); border-radius: 10px; padding: 4px 12px; margin-top: 14px; }
-  .sendopts .check { margin: 10px 0; }
-  .sendopts small { display: block; color: var(--muted); font-size: 12px; }
   .padwrap { position: relative; border: 2px dashed var(--line); border-radius: 10px; background: #fff; }
   .padwrap.locked { opacity: .45; pointer-events: none; }
   #pad { display: block; width: 100%; height: 180px; touch-action: none; border-radius: 10px; }
@@ -151,7 +148,18 @@
         </div>
         <div>
           <label for="sentBy">Sent by — your name <span class="opt">(optional)</span></label>
-          <input id="sentBy" autocomplete="off" autocapitalize="words">
+          <select id="sentBy">
+            <option value="">Select your name</option>
+            <option>Kevin</option>
+            <option>Dory</option>
+            <option>Tais</option>
+            <option>John</option>
+            <option>CJ</option>
+            <option>Felix</option>
+            <option>Emily</option>
+            <option>Yuly</option>
+            <option>Alexie</option>
+          </select>
         </div>
       </div>
 
@@ -166,13 +174,7 @@
           <input id="custPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="(818) 555-0123">
         </div>
       </div>
-      <div class="sendopts">
-        <div class="check" id="wrapSendEmail"><input type="checkbox" id="sendEmail"><label for="sendEmail">
-          Email the signing link<small id="sendEmailHint">Add an email above to use this</small></label></div>
-        <div class="check" id="wrapSendText"><input type="checkbox" id="sendText"><label for="sendText">
-          Text the signing link<small id="sendTextHint">Add a mobile number above to use this</small></label></div>
-      </div>
-      <p class="hint" style="margin:8px 0 0">Both are optional. You will always get a link you can copy.</p>
+      <p class="hint" style="margin:8px 0 0">Add an email, a mobile number, or both — we’ll send whichever you fill in. You will always get a link you can copy.</p>
 
       <button class="btn" id="createBtn">Create signing link</button>
       <div class="err" id="createErr"></div>
@@ -381,28 +383,16 @@ $('contractChoice').addEventListener('click', e => {
   err('createErr');
 });
 
-function updateSendOpts() {
-  const emailOk = validEmail($('custEmail').value);
-  const phoneOk = phoneDigits($('custPhone').value).length >= 10;
-  $('sendEmail').disabled = !emailOk; if (!emailOk) $('sendEmail').checked = false;
-  $('sendText').disabled = !phoneOk; if (!phoneOk) $('sendText').checked = false;
-  $('wrapSendEmail').classList.toggle('disabled', !emailOk);
-  $('wrapSendText').classList.toggle('disabled', !phoneOk);
-  $('sendEmailHint').textContent = emailOk ? 'We email the customer a “Review & sign” link from The Green Dumpster' : 'Add an email above to use this';
-  $('sendTextHint').textContent = phoneOk ? 'Opens a ready-to-send text on your phone, or copy it' : 'Add a mobile number above to use this';
-}
-['custEmail', 'custPhone'].forEach(id => $(id).addEventListener('input', updateSendOpts));
-
 function showCreate() {
   $('hdrSub').textContent = 'Office — send an agreement';
-  $('sentBy').value = $('sentBy').value || LS.get('tgd_office_sentby', '');
-  updateSendOpts();
+  const saved = LS.get('tgd_office_sentby', '');
+  if (saved && [...$('sentBy').options].some(o => o.value === saved)) $('sentBy').value = saved;
   show('sCreate');
 }
 
 function resetCreateForm() {
   ['address', 'custName', 'custCompany', 'jobNo', 'custEmail', 'custPhone'].forEach(id => $(id).value = '');
-  $('sendEmail').checked = false; $('sendText').checked = false;
+  // Keep the Sent by name so they don’t re-pick it every time.
   state.contractKey = null; state.created = null; state.requestId = null;
   document.querySelectorAll('#contractChoice button').forEach(x => x.classList.remove('sel'));
   err('createErr');
@@ -426,8 +416,8 @@ $('createBtn').onclick = async () => {
     contractKey: state.contractKey, serviceAddress,
     customerName: $('custName').value.trim(), company: $('custCompany').value.trim(),
     jobNumber: $('jobNo').value.trim(), customerEmail, customerPhone, sentBy,
-    sendEmail: $('sendEmail').checked && validEmail(customerEmail),
-    sendText: $('sendText').checked && phoneDigits(customerPhone).length >= 10,
+    sendEmail: validEmail(customerEmail),
+    sendText: phoneDigits(customerPhone).length >= 10,
   };
   const sig = JSON.stringify(Object.assign({}, body, { pin: '' }));
   if (!state.requestId || state.requestSig !== sig) { state.requestId = uuid(); state.requestSig = sig; }
