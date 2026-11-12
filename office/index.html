@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f7a3a">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>The Green Dumpster — Agreement</title>
+<style>
+  :root {
+    --green: #1f7a3a; --green-dk: #175e2c; --green-lt: #e8f3ec;
+    --ink: #1a1d1b; --muted: #5d6660; --line: #d6dbd8; --bg: #f4f6f5; --card: #fff;
+    --warn: #b45309; --warn-lt: #fef3c7; --err: #b91c1c; --err-lt: #fee2e2;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--green); color: #fff; padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 5; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 700; }
+  header .sub { font-size: 12px; opacity: .85; }
+  .pill { background: rgba(255,255,255,.18); color: #fff; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  main { max-width: 680px; margin: 0 auto; padding: 16px; padding-bottom: 48px; }
+  .screen { display: none; }
+  .screen.on { display: block; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  h3 { font-size: 15px; margin: 18px 0 6px; color: var(--green-dk); text-transform: uppercase; letter-spacing: .03em; }
+  p.hint { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 5px; }
+  label .opt { font-weight: 400; color: var(--muted); }
+  label .req { color: var(--err); }
+  input, select, textarea { width: 100%; font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--green); border-color: var(--green); }
+  input[readonly] { background: var(--bg); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+  @media (max-width: 420px) { .row { grid-template-columns: 1fr; } }
+  .choice { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (min-width: 560px) { .choice { grid-template-columns: 1fr 1fr 1fr; } }
+  .choice button { padding: 14px 8px; border: 2px solid var(--line); background: #fff; border-radius: 10px; font: inherit; font-weight: 700; color: var(--ink); text-align: center; cursor: pointer; }
+  .choice button small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .choice button.sel { border-color: var(--green); background: var(--green-lt); color: var(--green-dk); }
+  .btn { display: block; width: 100%; padding: 15px; border: 0; border-radius: 10px; background: var(--green); color: #fff; font: inherit; font-weight: 700; font-size: 17px; margin-top: 16px; cursor: pointer; text-align: center; text-decoration: none; }
+  .btn:disabled { background: #a9b5ae; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--green-dk); border: 2px solid var(--green); }
+  .btn.small { display: inline-block; width: auto; padding: 10px 14px; font-size: 14px; margin: 0; }
+  .err { background: var(--err-lt); color: var(--err); padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-top: 12px; display: none; }
+  .err.on { display: block; }
+  .ok { background: var(--green-lt); color: var(--green-dk); padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-top: 10px; }
+  .warnbox { background: var(--warn-lt); color: var(--warn); padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-top: 10px; }
+  .summary { font-size: 14px; background: var(--green-lt); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+  .summary b { color: var(--green-dk); }
+  .summary div + div { margin-top: 2px; }
+  #contractBox { height: 58vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .scrollnote { font-size: 13px; text-align: center; padding: 8px; color: var(--warn); font-weight: 600; }
+  .scrollnote.done { color: var(--green-dk); }
+  .check { display: flex; gap: 10px; align-items: flex-start; margin: 12px 0; font-size: 14px; }
+  .check input { width: 24px; height: 24px; flex: none; margin: 0; accent-color: var(--green); }
+  .check label { margin: 0; font-weight: 400; }
+  .check.disabled { opacity: .5; }
+  .sendopts { border: 1px solid var(--line); border-radius: 10px; padding: 4px 12px; margin-top: 14px; }
+  .sendopts .check { margin: 10px 0; }
+  .sendopts small { display: block; color: var(--muted); font-size: 12px; }
+  .padwrap { position: relative; border: 2px dashed var(--line); border-radius: 10px; background: #fff; }
+  .padwrap.locked { opacity: .45; pointer-events: none; }
+  #pad { display: block; width: 100%; height: 180px; touch-action: none; border-radius: 10px; }
+  .padline { position: absolute; left: 16px; right: 16px; bottom: 40px; border-bottom: 1px solid #b8c0bb; pointer-events: none; }
+  .padx { position: absolute; left: 18px; bottom: 44px; color: #9aa39e; font-size: 22px; pointer-events: none; }
+  .padbar { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 13px; color: var(--muted); }
+  .link { background: none; border: 0; color: var(--green-dk); font: inherit; font-weight: 600; text-decoration: underline; padding: 4px; cursor: pointer; }
+  .done-icon { width: 76px; height: 76px; border-radius: 50%; background: var(--green); color: #fff; font-size: 44px; display: grid; place-items: center; margin: 12px auto; }
+  .done-icon.info { background: var(--warn); }
+  .center { text-align: center; }
+  .demo { background: var(--warn-lt); color: var(--warn); font-size: 13px; padding: 8px 16px; text-align: center; font-weight: 600; }
+  .spinner { width: 42px; height: 42px; border: 4px solid var(--green-lt); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; margin: 24px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .linkrow { display: flex; gap: 8px; }
+  .linkrow input { flex: 1; min-width: 0; font-size: 14px; }
+  .actions { display: grid; gap: 10px; margin-top: 14px; }
+  .actions .btn { margin: 0; }
+  textarea { min-height: 96px; font-size: 14px; resize: vertical; }
+  .status { font-size: 14px; margin-top: 10px; }
+  a { color: var(--green-dk); }
+  .btn, a.btn { color: #fff; }
+  .btn.ghost { color: var(--green-dk); }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 99px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 20; }
+  .toast.on { opacity: .92; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1 id="hdrTitle">The Green Dumpster</h1>
+    <div class="sub" id="hdrSub">Office — send an agreement</div>
+  </div>
+  <span class="pill" id="hdrPill" hidden></span>
+</header>
+<div class="demo" id="demoBar" hidden>DEMO MODE — nothing is sent or saved</div>
+
+<main>
+  <!-- ===================== OFFICE (CSR) ===================== -->
+
+  <!-- OFFICE PIN -->
+  <section class="screen" id="sPin">
+    <div class="card">
+      <h2>Office sign-in</h2>
+      <p class="hint">Enter the office PIN. You only need to do this once on this computer or phone.</p>
+      <label for="pinIn">Office PIN</label>
+      <input id="pinIn" type="password" inputmode="numeric" autocomplete="off">
+      <button class="btn" id="pinBtn">Continue</button>
+      <div class="err" id="pinErr"></div>
+    </div>
+  </section>
+
+  <!-- CREATE INVITE -->
+  <section class="screen" id="sCreate">
+    <div class="card">
+      <h2>Send an agreement to sign</h2>
+      <p class="hint">Pick the service, fill in the job, then email it, text it, or copy the link.</p>
+
+      <label>Service type <span class="req">*</span></label>
+      <div class="choice" id="contractChoice">
+        <button type="button" data-key="residential">Residential Dumpster<small>Homeowner</small></button>
+        <button type="button" data-key="contractor">Contractor Dumpster<small>Business / contractor</small></button>
+        <button type="button" data-key="fence">Temp Fence<small>Fence &amp; barriers rental</small></button>
+        <button type="button" data-key="restroom">Portable Restrooms<small>Incl. luxury trailers</small></button>
+        <button type="button" data-key="powerpole">Power Poles<small>Temporary power</small></button>
+        <button type="button" data-key="fencesales">Fencing Sales<small>Materials purchase</small></button>
+        <button type="button" data-key="junk">Junk Removal<small>Haul-away service</small></button>
+      </div>
+
+      <h3>Job</h3>
+      <label for="address">Service address <span class="req">*</span></label>
+      <input id="address" autocomplete="off" placeholder="123 Main St, Van Nuys, CA">
+      <div class="row">
+        <div>
+          <label for="custName">Customer name <span class="opt">(optional)</span></label>
+          <input id="custName" autocomplete="off" autocapitalize="words">
+        </div>
+        <div>
+          <label for="custCompany">Company <span class="opt">(optional)</span></label>
+          <input id="custCompany" autocomplete="off">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="jobNo">Job # <span class="opt">(optional)</span></label>
+          <input id="jobNo" autocomplete="off" inputmode="text">
+        </div>
+        <div>
+          <label for="sentBy">Sent by — your name <span class="opt">(optional)</span></label>
+          <input id="sentBy" autocomplete="off" autocapitalize="words">
+        </div>
+      </div>
+
+      <h3>Send to</h3>
+      <div class="row">
+        <div>
+          <label for="custEmail">Customer email <span class="opt">(optional)</span></label>
+          <input id="custEmail" type="email" inputmode="email" autocapitalize="off" autocomplete="off">
+        </div>
+        <div>
+          <label for="custPhone">Customer mobile <span class="opt">(optional)</span></label>
+          <input id="custPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="(818) 555-0123">
+        </div>
+      </div>
+      <div class="sendopts">
+        <div class="check" id="wrapSendEmail"><input type="checkbox" id="sendEmail"><label for="sendEmail">
+          Email the signing link<small id="sendEmailHint">Add an email above to use this</small></label></div>
+        <div class="check" id="wrapSendText"><input type="checkbox" id="sendText"><label for="sendText">
+          Text the signing link<small id="sendTextHint">Add a mobile number above to use this</small></label></div>
+      </div>
+      <p class="hint" style="margin:8px 0 0">Both are optional. You will always get a link you can copy.</p>
+
+      <button class="btn" id="createBtn">Create signing link</button>
+      <div class="err" id="createErr"></div>
+    </div>
+    <div class="center"><button class="link" id="resetPinBtn">Change office PIN</button></div>
+  </section>
+
+  <!-- CREATING -->
+  <section class="screen" id="sCreating">
+    <div class="card center">
+      <div class="spinner"></div>
+      <h2>Creating the signing link…</h2>
+      <p class="hint">This takes a few seconds.</p>
+    </div>
+  </section>
+
+  <!-- LINK READY -->
+  <section class="screen" id="sLink">
+    <div class="card">
+      <h2>Signing link ready</h2>
+      <div class="summary" id="linkSummary"></div>
+
+      <label for="linkOut">Customer signing link</label>
+      <div class="linkrow">
+        <input id="linkOut" readonly>
+        <button class="btn small" id="copyLinkBtn">Copy link</button>
+      </div>
+      <div class="status" id="emailStatus"></div>
+
+      <div id="textBlock" hidden>
+        <label for="smsOut">Text message</label>
+        <textarea id="smsOut"></textarea>
+        <div class="actions">
+          <a class="btn" id="smsBtn" href="#">Open text message</a>
+          <button class="btn ghost" id="copySmsBtn">Copy text message</button>
+        </div>
+        <p class="hint" style="margin:8px 0 0">On a phone, “Open text message” fills it in — just tap Send. On a computer, copy it into your texting app.</p>
+      </div>
+
+      <p class="hint" style="margin-top:14px" id="expiresNote"></p>
+      <button class="btn ghost" id="anotherBtn">Send another agreement</button>
+    </div>
+  </section>
+
+  <!-- ===================== CUSTOMER ===================== -->
+
+  <!-- LOADING -->
+  <section class="screen" id="sLoading">
+    <div class="card center">
+      <div class="spinner"></div>
+      <h2>Loading your agreement…</h2>
+    </div>
+  </section>
+
+  <!-- MESSAGE (invalid / expired / already signed / no connection) -->
+  <section class="screen" id="sMsg">
+    <div class="card center">
+      <div class="done-icon info" id="msgIcon">!</div>
+      <h2 id="msgTitle">This link can't be opened</h2>
+      <p class="hint" id="msgText"></p>
+      <button class="btn ghost" id="msgRetry" hidden>Try again</button>
+    </div>
+  </section>
+
+  <!-- SIGN -->
+  <section class="screen" id="sSign">
+    <div class="card">
+      <h2 id="signTitle">Agreement</h2>
+      <p class="hint">Please read the agreement below. Scroll to the end to sign.</p>
+      <div class="summary" id="signSummary"></div>
+      <div id="contractBox"></div>
+      <div class="scrollnote" id="scrollNote">↓ Scroll to the end of the agreement to sign</div>
+    </div>
+
+    <div class="card" id="signCard">
+      <label for="printed">Print your full name</label>
+      <input id="printed" autocomplete="name" autocapitalize="words">
+
+      <div id="companyWrap">
+        <label for="company">Company name <span class="opt">(if signing for a business)</span></label>
+        <input id="company" autocomplete="organization">
+      </div>
+
+      <label for="signEmail">Email for your copy <span class="opt">(optional)</span></label>
+      <input id="signEmail" type="email" inputmode="email" autocapitalize="off" autocomplete="email">
+
+      <div class="check"><input type="checkbox" id="c1"><label for="c1" id="c1Label"></label></div>
+      <div class="check"><input type="checkbox" id="c2"><label for="c2" id="c2Label"></label></div>
+
+      <label>Sign below</label>
+      <div class="padwrap locked" id="padWrap">
+        <canvas id="pad"></canvas>
+        <div class="padline"></div><div class="padx">✕</div>
+      </div>
+      <div class="padbar"><span id="padHint">Scroll the agreement to the end first</span><button class="link" id="clearPad">Clear</button></div>
+
+      <button class="btn" id="submitBtn" disabled>Sign agreement</button>
+      <div class="err" id="signErr"></div>
+    </div>
+  </section>
+
+  <!-- SENDING -->
+  <section class="screen" id="sSending">
+    <div class="card center">
+      <div class="spinner"></div>
+      <h2>Saving your signed agreement…</h2>
+      <p class="hint">This takes a few seconds. Please keep this page open.</p>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section class="screen" id="sDone">
+    <div class="card center">
+      <div class="done-icon">✓</div>
+      <h2>Signed — thank you!</h2>
+      <p class="hint" id="doneMsg"></p>
+      <p class="hint">Questions? Email <a href="mailto:office@thegreendumpster.com">office@thegreendumpster.com</a>.</p>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONFIG: the Apps Script web app URL (same backend as the driver app) =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbyhSqjkBrfuEyNceuakYTUp7w7oFpk-WJaW9l12-16MRxjPkxtYxXsV5biUbIvGbpps/exec';
+// ================================================================================
+
+const DEMO = !API_URL || /[?&]demo=1\b/.test(location.search);
+const CONTRACT_NAMES = {
+  residential: 'Residential Dumpster Rental Agreement',
+  contractor: 'Contractor Dumpster Rental Agreement',
+  fence: 'Temporary Fence and Crowd Control Barrier Rental Agreement',
+  restroom: 'Portable Restroom & Luxury Restroom Rental Agreement',
+  powerpole: 'Temporary Power Pole Rental Agreement',
+  fencesales: 'Fencing Sales Agreement',
+  junk: 'Junk Removal Service Agreement',
+};
+const ESIGN_TEXT = 'I agree to sign electronically. My electronic signature is the same as my handwritten signature, and I can get my copy by email.';
+
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+};
+const SS = {
+  get(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} },
+};
+const $ = id => document.getElementById(id);
+const state = { mode: 'office', contractKey: null, token: null, invite: null, contract: null, viewedToEnd: false, geo: null, inked: 0, created: null };
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  window.scrollTo(0, 0);
+}
+function err(id, msg) { const e = $(id); e.textContent = msg || ''; e.classList.toggle('on', !!msg); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])); }
+function uuid() { return (crypto.randomUUID ? crypto.randomUUID() : 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)); }
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); }
+function validEmail(v) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(v || '').trim()); }
+function phoneDigits(v) { return String(v || '').replace(/\D/g, ''); }
+function smsNumber(v) { const d = phoneDigits(v); return d.length === 10 ? '+1' + d : (d.length === 11 && d[0] === '1' ? '+' + d : d); }
+
+async function api(body) {
+  const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }); // text/plain → no CORS preflight
+  return res.json();
+}
+async function apiGet(qs) {
+  const res = await fetch(API_URL + '?' + qs);
+  return res.json();
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e2) {}
+    ta.remove(); return ok;
+  }
+}
+
+// =====================================================================
+// OFFICE (CSR) FLOW
+// =====================================================================
+$('pinBtn').onclick = async () => {
+  const pin = $('pinIn').value.trim();
+  err('pinErr');
+  if (!pin) return;
+  if (!DEMO) {
+    $('pinBtn').disabled = true;
+    try {
+      const r = await api({ action: 'checkOfficePin', pin });
+      if (!r.ok) return err('pinErr', r.error || 'Wrong PIN');
+    } catch (e) { return err('pinErr', 'Could not connect — check your internet and try again.'); }
+    finally { $('pinBtn').disabled = false; }
+  }
+  LS.set('tgd_office_pin', pin);
+  showCreate();
+};
+$('pinIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('pinBtn').click(); });
+$('resetPinBtn').onclick = () => { LS.del('tgd_office_pin'); $('pinIn').value = ''; show('sPin'); };
+
+$('contractChoice').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.contractKey = b.dataset.key;
+  document.querySelectorAll('#contractChoice button').forEach(x => x.classList.toggle('sel', x === b));
+  err('createErr');
+});
+
+function updateSendOpts() {
+  const emailOk = validEmail($('custEmail').value);
+  const phoneOk = phoneDigits($('custPhone').value).length >= 10;
+  $('sendEmail').disabled = !emailOk; if (!emailOk) $('sendEmail').checked = false;
+  $('sendText').disabled = !phoneOk; if (!phoneOk) $('sendText').checked = false;
+  $('wrapSendEmail').classList.toggle('disabled', !emailOk);
+  $('wrapSendText').classList.toggle('disabled', !phoneOk);
+  $('sendEmailHint').textContent = emailOk ? 'We email the customer a “Review & sign” link from The Green Dumpster' : 'Add an email above to use this';
+  $('sendTextHint').textContent = phoneOk ? 'Opens a ready-to-send text on your phone, or copy it' : 'Add a mobile number above to use this';
+}
+['custEmail', 'custPhone'].forEach(id => $(id).addEventListener('input', updateSendOpts));
+
+function showCreate() {
+  $('hdrSub').textContent = 'Office — send an agreement';
+  $('sentBy').value = $('sentBy').value || LS.get('tgd_office_sentby', '');
+  updateSendOpts();
+  show('sCreate');
+}
+
+function resetCreateForm() {
+  ['address', 'custName', 'custCompany', 'jobNo', 'custEmail', 'custPhone'].forEach(id => $(id).value = '');
+  $('sendEmail').checked = false; $('sendText').checked = false;
+  state.contractKey = null; state.created = null; state.requestId = null;
+  document.querySelectorAll('#contractChoice button').forEach(x => x.classList.remove('sel'));
+  err('createErr');
+}
+
+$('createBtn').onclick = async () => {
+  err('createErr');
+  if (!state.contractKey) return err('createErr', 'Pick the service type.');
+  const serviceAddress = $('address').value.trim();
+  if (!serviceAddress) return err('createErr', 'Enter the service address.');
+  const customerEmail = $('custEmail').value.trim();
+  if (customerEmail && !validEmail(customerEmail)) return err('createErr', 'That email address does not look right.');
+  const customerPhone = $('custPhone').value.trim();
+  if (customerPhone && phoneDigits(customerPhone).length < 10) return err('createErr', 'Enter a full mobile number (10 digits), or leave it blank.');
+
+  const sentBy = $('sentBy').value.trim();
+  LS.set('tgd_office_sentby', sentBy);
+  // Same id for retries of this exact form → the server returns the same link instead of a second one.
+  const body = {
+    action: 'createInvite', pin: LS.get('tgd_office_pin', ''),
+    contractKey: state.contractKey, serviceAddress,
+    customerName: $('custName').value.trim(), company: $('custCompany').value.trim(),
+    jobNumber: $('jobNo').value.trim(), customerEmail, customerPhone, sentBy,
+    sendEmail: $('sendEmail').checked && validEmail(customerEmail),
+    sendText: $('sendText').checked && phoneDigits(customerPhone).length >= 10,
+  };
+  const sig = JSON.stringify(Object.assign({}, body, { pin: '' }));
+  if (!state.requestId || state.requestSig !== sig) { state.requestId = uuid(); state.requestSig = sig; }
+  body.requestId = state.requestId;
+
+  show('sCreating');
+  let r;
+  if (DEMO) {
+    await new Promise(res => setTimeout(res, 700));
+    r = { ok: true, token: 'demo' + Math.random().toString(16).slice(2).padEnd(40, '0'), emailed: body.sendEmail ? 'sent' : 'not requested',
+      contractName: CONTRACT_NAMES[body.contractKey], expiresAt: new Date(Date.now() + 14 * 864e5).toISOString() };
+    r.url = location.origin + location.pathname + '?demo=1#t=' + r.token;
+  } else {
+    try { r = await api(body); }
+    catch (e) { show('sCreate'); return err('createErr', 'Could not connect — check your internet and try again.'); }
+  }
+  if (!r.ok) {
+    if (r.code === 'PIN') { LS.del('tgd_office_pin'); show('sPin'); return err('pinErr', 'The office PIN changed or is wrong. Enter it again, then create the link.'); }
+    show('sCreate'); return err('createErr', r.error || 'Could not create the link.');
+  }
+  state.created = Object.assign({}, body, r);
+  showLink();
+};
+
+function smsMessage(c) {
+  const who = c.sentBy ? c.sentBy + ' at The Green Dumpster' : 'The Green Dumpster';
+  const hi = c.customerName ? 'Hi ' + c.customerName.split(/\s+/)[0] + ', this is ' : 'Hi, this is ';
+  return hi + who + '. Please review and sign your ' + (c.contractName || CONTRACT_NAMES[c.contractKey]) +
+    ' for ' + c.serviceAddress + ' here: ' + c.url + '  Questions? Reply here or email office@thegreendumpster.com.';
+}
+function smsHref(number, text) {
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return 'sms:' + encodeURIComponent(number).replace(/%2B/g, '+') + (ios ? '&' : '?') + 'body=' + encodeURIComponent(text);
+}
+
+function showLink() {
+  const c = state.created;
+  $('linkSummary').innerHTML =
+    '<div><b>' + esc(c.contractName || CONTRACT_NAMES[c.contractKey]) + '</b></div>' +
+    '<div>' + esc(c.serviceAddress) + '</div>' +
+    (c.customerName || c.company ? '<div>' + esc([c.customerName, c.company].filter(Boolean).join(' — ')) + '</div>' : '') +
+    (c.jobNumber ? '<div>Job # ' + esc(c.jobNumber) + '</div>' : '');
+  $('linkOut').value = c.url;
+
+  const st = $('emailStatus');
+  if (c.sendEmail) {
+    if (c.emailed === 'sent') { st.className = 'ok'; st.textContent = '✓ Emailed the signing link to ' + c.customerEmail + '.'; }
+    else { st.className = 'err on'; st.textContent = 'The email did not go out (' + (c.emailed || 'unknown error') + '). Copy the link and send it another way.'; }
+  } else { st.className = 'status'; st.textContent = ''; }
+
+  const wantText = !!c.sendText;
+  $('textBlock').hidden = !wantText;
+  if (wantText) {
+    const msg = smsMessage(c);
+    $('smsOut').value = msg;
+    $('smsBtn').href = smsHref(smsNumber(c.customerPhone), msg);
+  }
+  $('expiresNote').textContent = c.expiresAt
+    ? 'The link works until ' + new Date(c.expiresAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) + ' and can be signed once. You will see it in Slack when it is signed.'
+    : '';
+  $('hdrSub').textContent = 'Office — link ready';
+  show('sLink');
+}
+$('smsOut').addEventListener('input', () => {
+  if (state.created) $('smsBtn').href = smsHref(smsNumber(state.created.customerPhone), $('smsOut').value);
+});
+$('copyLinkBtn').onclick = async () => toast(await copyText($('linkOut').value) ? 'Link copied' : 'Select the link and copy it');
+$('copySmsBtn').onclick = async () => toast(await copyText($('smsOut').value) ? 'Text message copied' : 'Select the text and copy it');
+$('linkOut').addEventListener('focus', e => e.target.select());
+$('anotherBtn').onclick = () => { resetCreateForm(); showCreate(); };
+
+// =====================================================================
+// CUSTOMER FLOW (#t=TOKEN)
+// =====================================================================
+function tokenFromHash() {
+  const m = /(?:^#|&)t=([A-Za-z0-9]+)/.exec(location.hash || '');
+  return m ? m[1] : null;
+}
+
+const DEMO_HTML = '<html><body><h3>THE GREEN DUMPSTER LLC</h3><p><b>DEMO AGREEMENT</b></p>' +
+  Array.from({ length: 30 }, (_, i) => '<p><b>' + (i + 1) + '.</b> Sample term text. The real page loads the live agreement.</p>').join('') +
+  '</body></html>';
+
+function msg(title, text, opts) {
+  opts = opts || {};
+  $('msgTitle').textContent = title;
+  $('msgText').textContent = text;
+  $('msgIcon').textContent = opts.icon || '!';
+  $('msgIcon').classList.toggle('info', !opts.good);
+  $('msgRetry').hidden = !opts.retry;
+  show('sMsg');
+}
+
+async function loadInvite() {
+  state.mode = 'customer';
+  $('hdrSub').textContent = 'Agreement';
+  $('hdrPill').hidden = true;
+  show('sLoading');
+  let r;
+  if (DEMO) {
+    await new Promise(res => setTimeout(res, 500));
+    r = { ok: true, invite: { contractKey: 'fence', contractName: CONTRACT_NAMES.fence, family: 'asr', serviceAddress: '123 Demo St, Van Nuys, CA',
+      customerName: 'Pat Demo', company: '', customerEmail: '', consent: { readAgree: 'I have read and agree to this Agreement, including its payment, indemnification, liability, and card-on-file terms.', esign: ESIGN_TEXT } },
+      contract: { key: 'fence', name: CONTRACT_NAMES.fence, version: 'demo', html: DEMO_HTML } };
+  } else {
+    try { r = await apiGet('invite=' + encodeURIComponent(state.token)); }
+    catch (e) { return msg('No connection', 'We could not load your agreement. Check your internet connection and try again.', { retry: true }); }
+  }
+  if (!r.ok) {
+    if (r.code === 'SIGNED') return msg('Already signed', 'This agreement has already been signed. Thank you! If you need a copy, email office@thegreendumpster.com.', { icon: '✓', good: true });
+    if (r.code === 'EXPIRED') return msg('This link has expired', 'Signing links are good for 14 days. Please contact The Green Dumpster office at office@thegreendumpster.com and we will send you a new one.');
+    if (r.code === 'CANCELLED') return msg('This link is no longer active', 'The office has replaced or cancelled this agreement. Please use the newest link you received, or email office@thegreendumpster.com.');
+    if (r.code === 'NOT_FOUND') return msg('This link is not valid', 'Please check that you opened the full link from your email or text message. If it still does not work, email office@thegreendumpster.com.');
+    return msg('Something went wrong', 'We could not load your agreement right now. Please try again in a minute.', { retry: true });
+  }
+  state.invite = r.invite; state.contract = r.contract;
+  openSign();
+}
+$('msgRetry').onclick = () => loadInvite();
+
+function openSign() {
+  const inv = state.invite, c = state.contract;
+  $('signTitle').textContent = c.name;
+  $('hdrSub').textContent = c.name;
+  document.title = c.name + ' — The Green Dumpster';
+  $('signSummary').innerHTML =
+    '<div><b>Service address:</b> ' + esc(inv.serviceAddress) + '</div>' +
+    (inv.jobNumber ? '<div><b>Job #:</b> ' + esc(inv.jobNumber) + '</div>' : '');
+  $('companyWrap').hidden = inv.contractKey === 'residential';
+  $('company').value = inv.company || '';
+  $('printed').value = inv.customerName || '';
+  $('signEmail').value = inv.customerEmail || '';
+  $('c1Label').textContent = (inv.consent && inv.consent.readAgree) || 'I have read and agree to this Agreement.';
+  $('c2Label').textContent = (inv.consent && inv.consent.esign) || ESIGN_TEXT;
+  $('c1').checked = false; $('c2').checked = false;
+  err('signErr');
+  show('sSign');
+  renderContract(c);
+  sizePad();
+  getGeo();
+}
+
+function renderContract(c) {
+  const box = $('contractBox');
+  box.innerHTML = '';
+  const host = document.createElement('div');
+  box.appendChild(host);
+  const root = host.attachShadow({ mode: 'open' });
+  const doc = new DOMParser().parseFromString(c.html, 'text/html');
+  doc.querySelectorAll('script, iframe, object, embed').forEach(n => n.remove());
+  const styles = Array.from(doc.querySelectorAll('style')).map(s => s.textContent).join('\n');
+  root.innerHTML = '<style>' + styles + `
+    .wrap { max-width: none !important; padding: 16px !important; margin: 0 !important; }
+    .wrap * { max-width: 100%; }
+    .wrap img { height: auto !important; }
+    .wrap p, .wrap li, .wrap span { font-size: 15px !important; line-height: 1.45 !important; }
+  </style><div class="wrap ${doc.body.className}">${doc.body.innerHTML}</div>`;
+  root.querySelectorAll('a[href]').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
+  box.scrollTop = 0;
+  state.viewedToEnd = false;
+  updateLock();
+  requestAnimationFrame(checkScroll);
+}
+
+function checkScroll() {
+  const b = $('contractBox');
+  if (!state.viewedToEnd && b.scrollTop + b.clientHeight >= b.scrollHeight - 40) {
+    state.viewedToEnd = true;
+    updateLock();
+  }
+}
+function updateLock() {
+  const ok = state.viewedToEnd;
+  $('padWrap').classList.toggle('locked', !ok);
+  $('scrollNote').textContent = ok ? '✓ You reached the end of the agreement' : '↓ Scroll to the end of the agreement to sign';
+  $('scrollNote').classList.toggle('done', ok);
+  $('padHint').textContent = ok ? 'Sign with your finger or mouse' : 'Scroll the agreement to the end first';
+  validateSign();
+}
+
+// ---------- Signature pad ----------
+const pad = $('pad');
+let ctx, drawing = false, last = null;
+function sizePad() {
+  const r = pad.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  pad.width = Math.round(r.width * dpr); pad.height = Math.round(r.height * dpr);
+  ctx = pad.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, r.width, r.height);
+  ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0b1f4d';
+  state.inked = 0; validateSign();
+}
+function pt(e) { const r = pad.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+pad.addEventListener('pointerdown', e => { drawing = true; last = pt(e); pad.setPointerCapture(e.pointerId); e.preventDefault(); });
+pad.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const p = pt(e);
+  ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+  last = p; state.inked++; e.preventDefault();
+});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(t => pad.addEventListener(t, () => { if (drawing) { drawing = false; validateSign(); } }));
+$('clearPad').onclick = sizePad;
+let resizeT;
+window.addEventListener('resize', () => {
+  // Rotating the phone resizes the pad; only clear it if nothing has been drawn.
+  clearTimeout(resizeT); resizeT = setTimeout(() => { if (state.mode === 'customer' && !state.inked && $('sSign').classList.contains('on')) sizePad(); }, 200);
+});
+
+function validateSign() {
+  const ok = state.viewedToEnd && $('printed').value.trim().length >= 3 && $('c1').checked && $('c2').checked && state.inked > 15;
+  $('submitBtn').disabled = !ok;
+}
+['printed', 'c1', 'c2'].forEach(id => $(id).addEventListener('input', validateSign));
+['c1', 'c2'].forEach(id => $(id).addEventListener('change', validateSign));
+$('contractBox').addEventListener('scroll', checkScroll, { passive: true });
+
+function getGeo() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    p => { state.geo = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }; },
+    () => {}, { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 });
+}
+
+$('submitBtn').onclick = async () => {
+  err('signErr');
+  const email = $('signEmail').value.trim();
+  if (email && !validEmail(email)) return err('signErr', 'That email address does not look right — fix it or leave it blank.');
+  // One record id per link in this tab, so a retry after a timeout never makes a second contract.
+  const idKey = 'tgd_office_rec_' + state.token;
+  let id = SS.get(idKey); if (!id) { id = uuid(); SS.set(idKey, id); }
+  const rec = {
+    action: 'signInvite', token: state.token, id,
+    printedName: $('printed').value.trim(), company: $('companyWrap').hidden ? '' : $('company').value.trim(),
+    customerEmail: email, contractVersion: state.contract.version,
+    signature: pad.toDataURL('image/png'), consent: { readAgree: $('c1').checked, esign: $('c2').checked },
+    viewedToEnd: state.viewedToEnd, signedAtClient: new Date().toString(), geo: state.geo, userAgent: navigator.userAgent,
+  };
+  $('submitBtn').disabled = true;
+  show('sSending');
+  if (DEMO) { setTimeout(() => done({ emailed: email ? 'sent' : 'no email' }, email), 900); return; }
+  try {
+    const r = await api(rec);
+    if (r.ok) return done(r, email);
+    if (r.code === 'EXPIRED') return msg('This link has expired', 'Signing links are good for 14 days. Please email office@thegreendumpster.com and we will send you a new one.');
+    if (r.code === 'NOT_FOUND' || r.code === 'CANCELLED') return msg('This link is no longer active', 'Please use the newest link you received, or email office@thegreendumpster.com.');
+    show('sSign'); validateSign(); err('signErr', 'Could not save: ' + (r.error || 'please try again.'));
+  } catch (e) {
+    show('sSign'); validateSign();
+    err('signErr', 'We could not reach our server. Check your internet connection and tap “Sign agreement” again — you will not be signed twice.');
+  }
+};
+
+function done(r, email) {
+  let text;
+  if (r.alreadySigned) text = 'This agreement was already signed. No further action is needed.';
+  else if (r.emailed === 'sent') text = 'A signed copy is on its way to ' + (email || 'your email') + '. You can close this page.';
+  else text = 'Your signed agreement has been sent to The Green Dumpster. You can close this page.';
+  $('doneMsg').textContent = text;
+  $('hdrSub').textContent = 'Signed';
+  show('sDone');
+}
+
+// ---------- Boot ----------
+function boot() {
+  $('demoBar').hidden = !DEMO;
+  state.token = tokenFromHash();
+  if (state.token) return loadInvite();
+  state.mode = 'office';
+  if (DEMO || LS.get('tgd_office_pin', '')) showCreate(); else show('sPin');
+}
+window.addEventListener('hashchange', () => { if (tokenFromHash() !== state.token) boot(); });
+boot();
+</script>
+</body>
+</html>
